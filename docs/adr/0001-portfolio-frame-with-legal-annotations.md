@@ -1,0 +1,3 @@
+# Portfolio frame with legal annotations
+
+We considered three frames for this idea: a real consumer product (must survive GDPR, CCPA, platform ToS enforcement, and app-store review), a personal tool (one user vetting their own dates), and a portfolio/learning project. We chose the portfolio frame: the goal is a complete end-to-end pipeline — OSINT acquisition, psychographic profiling, match scoring — with every capability demonstrable. Every component that would skirt GDPR/CCPA/ToS/CFAA/BIPA in a commercial setting gets an explicit legal side-note instead of being designed out. Consequence: this design is not shippable as a consumer product as-is; the annotations, not the architecture, carry the compliance story.
