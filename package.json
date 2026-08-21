@@ -1,0 +1,18 @@
+{
+  "name": "osint-dating-match",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "OSINT-powered compatibility profiler — portfolio design study",
+  "scripts": {
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "start": "tsx src/cli.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.6.0",
+    "vitest": "^3.0.0"
+  }
+}
