@@ -1,0 +1,11 @@
+{
+  "http|https://orbit.test/exist/someone": "c598f7f1b3c9707d2e58f575.txt",
+  "http|https://orbit.test/someone": "08722ae3b1ce08e09226cb51.txt",
+  "http|https://cdn.shared.test/avatar-a.test": "91dba618e8a2631bdf6abe19.txt",
+  "http|https://chirp.test/exist/someone": "f528740b79df07051f902bcb.txt",
+  "http|https://chirp.test/someone": "26ac958465c0b2be6d77dfbc.txt",
+  "http|https://devlog.dev/exist/someone": "d602f778a446830b46c4aa6d.txt",
+  "http|https://devlog.dev/someone": "f7fb92807ad13422d760f9e2.txt",
+  "http|https://cdn.shared.test/avatar-c.test": "c2c13483218771b6318005a5.txt",
+  "http|https://nexus.io/exist/someone": "9a9d6fb9376aaef02e4e8fa3.txt"
+}

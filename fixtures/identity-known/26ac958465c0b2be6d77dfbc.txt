@@ -1,0 +1,1 @@
+{"status":200,"body":"<meta property=\"og:title\" content=\"Sam Okafor\">\n<meta property=\"og:description\" content=\"Photographer based in Lagos\">\n<meta property=\"og:image\" content=\"https://cdn.shared.test/avatar-a.test\">"}

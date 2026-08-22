@@ -1,12 +1,10 @@
 import type {
-  Claim,
   Corpus,
   Dossier,
-  DossierLayerName,
   IdentityGraph,
   MatchVerdict,
 } from "./domain.js";
-import { DOSSIER_LAYERS } from "./domain.js";
+import { DOSSIER_LAYERS, emptyLayers } from "./domain.js";
 import type {
   AcquisitionStage,
   DossierAssemblyStage,
@@ -18,18 +16,11 @@ import type {
   VerdictRenderingStage,
 } from "./spine.js";
 
-function emptyLayers(): Dossier["layers"] {
-  const layers = {} as Record<DossierLayerName, Claim[]>;
-  for (const layer of DOSSIER_LAYERS) {
-    layers[layer] = [];
-  }
-  return layers;
-}
-
 export function emptyDossier(handle: string): Dossier {
   return {
     person: { primaryHandle: handle },
     mode: "recon",
+    version: 0,
     layers: emptyLayers(),
   };
 }

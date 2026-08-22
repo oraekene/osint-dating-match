@@ -1,13 +1,13 @@
 import { createHash } from "node:crypto";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
-import type { ExternalPorts } from "./ports.js";
+import type { ExternalPorts, HttpResponseBody } from "./ports.js";
 
 const MANIFEST_FILE = "manifest.json";
 
 type PortName = keyof ExternalPorts;
 
-const CALL: Record<PortName, (ports: ExternalPorts, key: string) => Promise<string>> = {
+const CALL: Record<PortName, (ports: ExternalPorts, key: string) => Promise<unknown>> = {
   http: (ports, key) => ports.http.get(key),
   llm: (ports, key) => ports.llm.complete(key),
   browser: (ports, key) => ports.browser.visit(key),
@@ -34,22 +34,22 @@ export class RecordingGateway {
   private async through(
     port: PortName,
     key: string,
-    call: () => Promise<string>,
-  ): Promise<string> {
+    call: () => Promise<unknown>,
+  ): Promise<unknown> {
     const id = entryId(port, key);
     const existing = this.captured.get(id);
-    if (existing !== undefined) return existing;
-    const body = await call();
-    this.captured.set(id, body);
-    return body;
+    if (existing !== undefined) return JSON.parse(existing) as unknown;
+    const value = await call();
+    this.captured.set(id, JSON.stringify(value));
+    return value;
   }
 
   async saveTo(dir: string): Promise<void> {
     await mkdir(dir, { recursive: true });
     const manifest: Record<string, string> = {};
-    for (const [id, body] of this.captured) {
+    for (const [id, serialized] of this.captured) {
       const file = fileNameFor(id);
-      await writeFile(path.join(dir, file), body, "utf8");
+      await writeFile(path.join(dir, file), serialized, "utf8");
       manifest[id] = file;
     }
     await writeFile(
@@ -75,7 +75,7 @@ export class FixtureGateway {
     return new FixtureGateway(JSON.parse(raw) as Record<string, string>, dir);
   }
 
-  private async replay(port: PortName, key: string): Promise<string> {
+  private async replay(port: PortName, key: string): Promise<unknown> {
     const id = entryId(port, key);
     const file = this.manifest[id];
     if (!file) {
@@ -83,16 +83,42 @@ export class FixtureGateway {
         `No fixture recorded for ${id} — record the interaction before running without live access`,
       );
     }
-    return readFile(path.join(this.dir, file), "utf8");
+    const parsed = JSON.parse(
+      await readFile(path.join(this.dir, file), "utf8"),
+    ) as unknown;
+    if (port === "http") {
+      const response = parsed as HttpResponseBody;
+      if (
+        typeof response !== "object" ||
+        response === null ||
+        typeof response.status !== "number" ||
+        typeof response.body !== "string"
+      ) {
+        throw new Error(
+          `Corrupted fixture for ${id} — expected an {status, body} HTTP response`,
+        );
+      }
+      return response;
+    }
+    if (typeof parsed !== "string") {
+      throw new Error(`Corrupted fixture for ${id} — expected a string body`);
+    }
+    return parsed;
   }
 }
 
 function replayPorts(
-  perform: (port: PortName, key: string) => Promise<string>,
+  perform: (port: PortName, key: string) => Promise<unknown>,
 ): ExternalPorts {
   return {
-    http: { get: (key) => perform("http", key) },
-    llm: { complete: (key) => perform("llm", key) },
-    browser: { visit: (key) => perform("browser", key) },
+    http: {
+      get: async (key) => (await perform("http", key)) as HttpResponseBody,
+    },
+    llm: {
+      complete: async (key) => (await perform("llm", key)) as string,
+    },
+    browser: {
+      visit: async (key) => (await perform("browser", key)) as string,
+    },
   };
 }

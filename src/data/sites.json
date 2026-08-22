@@ -1,0 +1,6 @@
+[
+  { "name": "Orbit", "existenceUrl": "https://orbit.test/exist/{account}", "profileUrl": "https://orbit.test/{account}", "hitStatus": 200 },
+  { "name": "Chirp", "existenceUrl": "https://chirp.test/exist/{account}", "profileUrl": "https://chirp.test/{account}", "hitStatus": 200 },
+  { "name": "Devlog", "existenceUrl": "https://devlog.dev/exist/{account}", "profileUrl": "https://devlog.dev/{account}", "hitStatus": 200 },
+  { "name": "Nexus", "existenceUrl": "https://nexus.io/exist/{account}", "profileUrl": "https://nexus.io/{account}", "hitStatus": 200 }
+]

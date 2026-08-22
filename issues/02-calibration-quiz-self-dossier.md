@@ -4,9 +4,13 @@
 
 **Blocked by:** 01.
 
-**Status:** ready-for-agent
+**Status:** ready-for-human
 
-- [ ] Completing the quiz produces a persisted self-Dossier whose Psychographics claims carry source=self-report
-- [ ] Self-Dossier renders in the identical five-layer structure used for Subjects
-- [ ] Quiz is retakable; latest responses win; Dossier versions increment rather than mutate
-- [ ] Delta-report structure exists and degrades gracefully before any inference exists
+- [x] Completing the quiz produces a persisted self-Dossier whose Psychographics carry source=self-report
+- [x] Self-Dossier renders in the identical five-layer structure used for Subjects
+- [x] Quiz is retakable; latest responses win; Dossier versions increment rather than mutate
+- [x] Delta-report structure exists and degrades gracefully before any inference exists
+
+## Comments
+
+Done. `npm start -- --quiz answers.json --self-dir <dir>` scores a BFI-10-style instrument, persists versioned self-Dossiers (JSON store, latest-wins), and the delta report degrades to "no inferred traits yet". Trait values are typed on Claim.value (no string parsing). Deferred: concurrent-store write safety (single-user CLI; revisit if multi-process use appears), and inferred-trait population arrives with acquisition (ticket 04+).

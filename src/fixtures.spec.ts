@@ -10,7 +10,7 @@ async function tempDir(): Promise<string> {
 }
 
 const liveOrigin: ExternalPorts = {
-  http: { get: async (url) => `body:${url}` },
+  http: { get: async (url) => ({ status: 200, body: `body:${url}` }) },
   llm: { complete: async (prompt) => `completion:${prompt}` },
   browser: { visit: async (url) => `snapshot:${url}` },
 };
@@ -25,9 +25,10 @@ test("interactions recorded against an origin replay identically with no origin 
 
   const replayed = (await FixtureGateway.fromDirectory(dir)).ports;
 
-  expect(await replayed.http.get("https://example.test/a")).toBe(
-    "body:https://example.test/a",
-  );
+  expect(await replayed.http.get("https://example.test/a")).toEqual({
+    status: 200,
+    body: "body:https://example.test/a",
+  });
   expect(await replayed.llm.complete("extract claims")).toBe(
     "completion:extract claims",
   );

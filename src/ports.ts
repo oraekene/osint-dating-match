@@ -1,5 +1,10 @@
+export interface HttpResponseBody {
+  status: number;
+  body: string;
+}
+
 export interface HttpPort {
-  get(url: string): Promise<string>;
+  get(url: string): Promise<HttpResponseBody>;
 }
 
 export interface LlmPort {

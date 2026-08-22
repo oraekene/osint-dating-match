@@ -22,11 +22,23 @@ export interface EvidenceTrace {
   confidence: number;
 }
 
+export type ClaimSource = "self-report" | "inferred";
+
 export interface Claim {
   assertion: string;
   layer: DossierLayerName;
+  source: ClaimSource;
   evidence: EvidenceTrace[];
   confidence: number;
+  value?: number;
+}
+
+export function emptyLayers(): Record<DossierLayerName, Claim[]> {
+  const layers = {} as Record<DossierLayerName, Claim[]>;
+  for (const layer of DOSSIER_LAYERS) {
+    layers[layer] = [];
+  }
+  return layers;
 }
 
 export interface PersonRef {
@@ -37,6 +49,7 @@ export interface PersonRef {
 export interface Dossier {
   person: PersonRef;
   mode: ProfilingMode;
+  version: number;
   layers: Record<DossierLayerName, Claim[]>;
 }
 

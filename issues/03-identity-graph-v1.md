@@ -4,9 +4,13 @@
 
 **Blocked by:** 01.
 
-**Status:** ready-for-agent
+**Status:** ready-for-human
 
-- [ ] Seed handle yields enumerated candidates with per-link confidence and corroborating evidence pointers
-- [ ] Low-confidence links are excluded from profiling input and visibly labeled as excluded
-- [ ] Known-identity fixture set resolves with zero false attributions
-- [ ] Enumeration and corroboration run entirely on recorded fixtures in CI
+- [x] Seed handle yields enumerated candidates with per-link confidence and corroborating evidence pointers
+- [x] Low-confidence links are excluded from profiling input and visibly labeled as excluded
+- [x] Known-identity fixture set resolves with zero false attributions
+- [x] Enumeration and corroboration run entirely on recorded fixtures in CI
+
+## Comments
+
+Done. Username enumeration + corroboration via avatar-bytes hash, display-name/bio similarity; confidence-scored links below 0.6 excluded; reference anchor chosen by dominant avatar hash so an impostor enumerated first cannot poison attribution (tested). Committed fixture set in fixtures/identity-known replays offline in CI. Deferred: true perceptual avatar hashing (needs image decoding), downstream exclusion enforcement lands with ticket 04's acquisition adapter consuming only non-excluded links, and swapping the curated 4-site stand-in manifest for the full WhatsMyName list is data-only work.
