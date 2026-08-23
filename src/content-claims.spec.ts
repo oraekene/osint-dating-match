@@ -29,6 +29,7 @@ const liveOrigin: ExternalPorts = {
                     title: "Best film cameras?",
                     selftext: "Shot Portra all weekend.",
                     permalink: "/r/AnalogCommunity/comments/abc1/",
+                    created_utc: 1785612600,
                   },
                 },
               ],
@@ -78,6 +79,12 @@ const liveOrigin: ExternalPorts = {
     complete: async () =>
       JSON.stringify([
         {
+          assertion: "Goes by Sam Okafor",
+          layer: "identityFacts",
+          pointers: ["https://www.reddit.com/user/someone"],
+          confidence: 0.95,
+        },
+        {
           assertion: "Shoots analog photography",
           layer: "interestLifestyle",
           pointers: ["https://www.reddit.com/r/AnalogCommunity/comments/abc1/"],
@@ -95,12 +102,22 @@ const liveOrigin: ExternalPorts = {
           pointers: ["https://www.youtube.com/watch?v=abc123Video"],
           confidence: 0.7,
         },
+        {
+          assertion:
+            "Shares photography knowledge publicly without hostility",
+          layer: "relationalSignals",
+          pointers: [
+            "https://www.reddit.com/r/AnalogCommunity/comments/abc1/",
+            "https://www.youtube.com/watch?v=abc123Video",
+          ],
+          confidence: 0.65,
+        },
       ]),
   },
   browser: { visit: async () => "" },
 };
 
-test("GitHub and YouTube claims flow through the same seam with platform citations", async () => {
+test("one handle yields the complete five-layer Dossier, every claim cited", async () => {
   const fixtureDir = await mkdtemp(path.join(tmpdir(), "odm-content-"));
   const recorder = new RecordingGateway(liveOrigin);
   await runPipeline(
@@ -115,6 +132,24 @@ test("GitHub and YouTube claims flow through the same seam with platform citatio
     { handle: "someone", priorities: {}, dealbreakers: [] },
     defaultSpine(replayed, { cacheDir }),
   );
+
+  for (const layer of [
+    "identityFacts",
+    "interestLifestyle",
+    "psychographics",
+    "relationalSignals",
+    "logistics",
+  ] as const) {
+    expect(Array.isArray(result.dossier.layers[layer])).toBe(true);
+  }
+  expect(result.dossier.layers.identityFacts.length).toBeGreaterThan(0);
+  expect(result.dossier.layers.relationalSignals.length).toBeGreaterThan(0);
+  expect(result.dossier.layers.logistics.length).toBeGreaterThan(0);
+
+  for (const claim of Object.values(result.dossier.layers).flat()) {
+    expect(claim.confidence).toBeGreaterThan(0);
+    expect(claim.evidence.length).toBeGreaterThan(0);
+  }
 
   const byPlatformOfFirstEvidence = new Map<string, string>();
   for (const claim of [

@@ -49,7 +49,7 @@ test("extraction keeps only evidence-cited claims in the allowed layers", async 
       },
       {
         assertion: "Owns a dog",
-        layer: "relationalSignals",
+        layer: "logistics",
         pointers: ["https://www.reddit.com/r/AnalogCommunity/comments/abc123/best/"],
         confidence: 0.6,
       },

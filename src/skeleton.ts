@@ -4,7 +4,7 @@ import type {
   IdentityGraph,
   MatchVerdict,
 } from "./domain.js";
-import { DOSSIER_LAYERS, emptyLayers } from "./domain.js";
+import { dedupKey, DOSSIER_LAYERS, emptyLayers, combineConfidence } from "./domain.js";
 import type {
   AcquisitionStage,
   DossierAssemblyStage,
@@ -71,7 +71,8 @@ export const assemblingDossierStage: DossierAssemblyStage = {
     const dossier = emptyDossier(handle);
     const byKey = new Map<string, number>();
     for (const claim of claims) {
-      const key = `${claim.layer}|${claim.assertion.trim().toLowerCase()}`;
+      if (claim.evidence.length === 0) continue;
+      const key = dedupKey(claim.layer, claim.assertion);
       const existingIndex = byKey.get(key);
       if (existingIndex === undefined) {
         dossier.layers[claim.layer].push(claim);
@@ -84,7 +85,10 @@ export const assemblingDossierStage: DossierAssemblyStage = {
       existing.evidence.push(
         ...claim.evidence.filter((e) => !seenPointers.has(e.pointer)),
       );
-      existing.confidence = Math.max(existing.confidence, claim.confidence);
+      existing.confidence = combineConfidence([
+        existing.confidence,
+        claim.confidence,
+      ]);
     }
     return dossier;
   },

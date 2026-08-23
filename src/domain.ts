@@ -47,6 +47,21 @@ export function emptyLayers(): Record<DossierLayerName, Claim[]> {
   return layers;
 }
 
+export function dedupKey(
+  layer: DossierLayerName,
+  assertion: string,
+): string {
+  return `${layer}|${assertion.trim().toLowerCase()}`;
+}
+
+export function combineConfidence(confidences: number[]): number {
+  const independentMiss = confidences.reduce(
+    (product, confidence) => product * (1 - Math.min(Math.max(confidence, 0), 1)),
+    1,
+  );
+  return Math.min(1 - independentMiss, 0.99);
+}
+
 export interface PersonRef {
   primaryHandle: string;
   displayName?: string;

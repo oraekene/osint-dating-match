@@ -14,47 +14,29 @@ export async function main(args: string[]): Promise<string> {
   let fixturesDir: string | null = null;
   let quizFile: string | null = null;
   let selfDir = "self-dossiers";
+  let dossierDir = "dossiers";
   let cacheDir = ".cache";
   const positional: string[] = [];
+  const flags: Record<string, (value: string) => void> = {
+    "--fixtures": (value) => (fixturesDir = value),
+    "--cache-dir": (value) => (cacheDir = value),
+    "--quiz": (value) => (quizFile = value),
+    "--dossier-dir": (value) => (dossierDir = value),
+    "--self-dir": (value) => (selfDir = value),
+  };
   for (let i = 0; i < args.length; i++) {
-    const arg = args[i];
-    if (arg === "--fixtures") {
+    const arg = args[i] ?? "";
+    const flag = flags[arg];
+    if (flag) {
       const value = args[i + 1];
       if (!value || value.startsWith("--")) {
-        throw new Error("usage: --fixtures requires a directory argument");
+        throw new Error(`usage: ${arg} requires a value argument`);
       }
-      fixturesDir = value;
+      flag(value);
       i++;
       continue;
     }
-    if (arg === "--cache-dir") {
-      const value = args[i + 1];
-      if (!value || value.startsWith("--")) {
-        throw new Error("usage: --cache-dir requires a directory argument");
-      }
-      cacheDir = value;
-      i++;
-      continue;
-    }
-    if (arg === "--quiz") {
-      const value = args[i + 1];
-      if (!value || value.startsWith("--")) {
-        throw new Error("usage: --quiz requires an answers file argument");
-      }
-      quizFile = value;
-      i++;
-      continue;
-    }
-    if (arg === "--self-dir") {
-      const value = args[i + 1];
-      if (!value || value.startsWith("--")) {
-        throw new Error("usage: --self-dir requires a directory argument");
-      }
-      selfDir = value;
-      i++;
-      continue;
-    }
-    positional.push(arg ?? "");
+    positional.push(arg);
   }
 
   if (quizFile) {
@@ -74,7 +56,10 @@ export async function main(args: string[]): Promise<string> {
   let spineOverride: Partial<Spine> = {};
   if (fixturesDir) {
     const gateway = await FixtureGateway.fromDirectory(fixturesDir);
-    spineOverride = defaultSpine(gateway.ports, { cacheDir });
+    spineOverride = defaultSpine(gateway.ports, {
+      cacheDir,
+      dossierDir,
+    });
   }
 
   const input: PipelineInput = { handle, priorities: {}, dealbreakers: [] };

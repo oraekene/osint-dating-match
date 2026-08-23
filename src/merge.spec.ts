@@ -81,7 +81,7 @@ test("assembling dossiers merges duplicate cross-platform claims without losing 
 
   expect(dossier.layers.interestLifestyle).toHaveLength(1);
   const merged = dossier.layers.interestLifestyle[0];
-  expect(merged?.confidence).toBe(0.8);
+  expect(merged?.confidence).toBeCloseTo(0.94, 2);
   expect(merged?.evidence).toHaveLength(2);
 });
 

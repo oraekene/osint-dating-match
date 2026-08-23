@@ -20,7 +20,12 @@ import { llmExtraction } from "./extraction.js";
 import { manifestIdentityGraph } from "./identity.js";
 import type { ExternalPorts } from "./ports.js";
 import { compositeAcquisition } from "./acquire.js";
+import { compositeInference, personaInference } from "./infer.js";
 import { activityInference } from "./activity.js";
+import {
+  JsonSubjectDossierStore,
+  versionedAssembly,
+} from "./subject-store.js";
 import { CachingHttpPort } from "./cache.js";
 import { githubAcquisition } from "./github.js";
 import { redditAcquisition } from "./reddit.js";
@@ -49,7 +54,7 @@ export interface Spine {
 
 export function defaultSpine(
   ports?: ExternalPorts,
-  options?: { cacheDir?: string },
+  options?: { cacheDir?: string; dossierDir?: string },
 ): Spine {
   const spine: Spine = {
     intake: skeletonIntake,
@@ -66,6 +71,12 @@ export function defaultSpine(
   const http = options?.cacheDir
     ? new CachingHttpPort(ports.http, options.cacheDir)
     : ports.http;
+  const assembly = options?.dossierDir
+    ? versionedAssembly(
+        assemblingDossierStage,
+        new JsonSubjectDossierStore(options.dossierDir),
+      )
+    : assemblingDossierStage;
   return {
     ...spine,
     identityGraph: manifestIdentityGraph(ports),
@@ -75,8 +86,8 @@ export function defaultSpine(
       youtubeAcquisition(http),
     ]),
     extraction: llmExtraction(ports.llm),
-    inference: activityInference(),
-    assembly: assemblingDossierStage,
+    inference: compositeInference([activityInference(), personaInference()]),
+    assembly,
   };
 }
 

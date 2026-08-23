@@ -10,6 +10,7 @@ interface ChildData {
   selftext?: string;
   body?: string;
   permalink?: string;
+  created_utc?: number;
 }
 
 async function fetchChildren(
@@ -58,6 +59,9 @@ export function redditAcquisition(http: HttpPort): AcquisitionStage {
           kind: "post",
           pointer: `${REDDIT}${child.permalink ?? ""}`,
           text: textParts(child.title, child.selftext),
+          ...(child.created_utc
+            ? { timestamp: new Date(child.created_utc * 1000).toISOString() }
+            : {}),
         });
       }
 
@@ -68,6 +72,9 @@ export function redditAcquisition(http: HttpPort): AcquisitionStage {
           kind: "comment",
           pointer: `${REDDIT}${child.permalink ?? ""}`,
           text: child.body ?? "",
+          ...(child.created_utc
+            ? { timestamp: new Date(child.created_utc * 1000).toISOString() }
+            : {}),
         });
       }
 

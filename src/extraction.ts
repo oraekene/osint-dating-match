@@ -3,8 +3,10 @@ import type { LlmPort } from "./ports.js";
 import type { ExtractionStage } from "./spine.js";
 
 const ALLOWED_LAYERS: readonly DossierLayerName[] = [
+  "identityFacts",
   "interestLifestyle",
   "psychographics",
+  "relationalSignals",
 ];
 
 interface RawClaim {
@@ -26,6 +28,7 @@ function extractionPrompt(corpus: Corpus): string {
     "Every claim MUST cite the pointer of the specific item that supports it.",
     "Never invent pointers. Never make claims without a supporting item.",
     `Allowed layers: ${ALLOWED_LAYERS.join(", ")}.`,
+    "For relationalSignals, describe only how the person treats or talks about others (exes, friends, family, strangers) — conflict style, hostility, warmth — citing the exact item where they said it.",
     "Respond with strict JSON: [{assertion, layer, pointers, confidence}] with confidence in [0,1].",
     "Return [] when nothing is supported.",
     "Content:",
