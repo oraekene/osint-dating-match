@@ -3,11 +3,8 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import { expect, test } from "vitest";
 import { main } from "./cli.js";
-import sitesJson from "./data/sites.json" with { type: "json" };
 import { RecordingGateway } from "./fixtures.js";
-import type { SiteEntry } from "./identity.js";
-
-const SITES: SiteEntry[] = sitesJson;
+import { runPipeline } from "./pipeline.js";
 
 test("one command runs the skeleton pipeline for a handle", async () => {
   const out = await main(["@someone"]);
@@ -52,22 +49,56 @@ test("--fixtures resolves the Identity Graph with zero live calls", async () => 
       get: async (url) => {
         if (url.includes("nexus.io")) return { status: 404, body: "" };
         if (url.includes("exist")) return { status: 200, body: "ok" };
-        if (url.includes("avatar"))
-          return { status: 200, body: "avatar-bytes-A" };
+        if (url.includes("/user/rae/about.json")) {
+          return {
+            status: 200,
+            body: JSON.stringify({ data: { public_description: "Beekeeper" } }),
+          };
+        }
+        if (url === "https://api.github.com/users/rae/repos") {
+          return { status: 200, body: JSON.stringify([]) };
+        }
+        if (url === "https://api.github.com/users/rae") {
+          return {
+            status: 200,
+            body: JSON.stringify({ login: "rae", name: "Rae Idris", bio: "Beekeeper" }),
+          };
+        }
+        if (url.includes("submitted.json") || url.includes("comments.json")) {
+          return { status: 200, body: JSON.stringify({ data: { children: [] } }) };
+        }
+        if (url === "https://www.reddit.com/user/rae") {
+          return {
+            status: 200,
+            body: '<meta property="og:title" content="Rae Idris"><meta property="og:description" content="Beekeeper in Leeds"><meta property="og:image" content="https://shared.test/avatar-r">',
+          };
+        }
+        if (url.includes("avatar")) {
+          return { status: 200, body: "avatar-bytes-R" };
+        }
         return {
           status: 200,
-          body: '<meta property="og:title" content="Rae Idris"><meta property="og:description" content="Beekeeper in Leeds"><meta property="og:image" content="https://shared.test/avatar.img">',
+          body: '<meta property="og:title" content="Rae Idris"><meta property="og:description" content="Beekeeper in Leeds"><meta property="og:image" content="https://shared.test/avatar-r">',
         };
       },
     },
-    llm: { complete: async () => "" },
+    llm: { complete: async () => "[]" },
     browser: { visit: async () => "" },
   });
-  const { resolveIdentityGraph } = await import("./identity.js");
-  await resolveIdentityGraph("rae", recorder.ports, SITES);
+  const { defaultSpine } = await import("./pipeline.js");
+  await runPipeline(
+    { handle: "rae", priorities: {}, dealbreakers: [] },
+    defaultSpine(recorder.ports),
+  );
   await recorder.saveTo(dir);
 
-  const out = await main(["--fixtures", dir, "rae"]);
+  const out = await main([
+    "--fixtures",
+    dir,
+    "--cache-dir",
+    path.join(dir, "cache"),
+    "rae",
+  ]);
   const parsed = JSON.parse(out) as {
     identityGraph: { links: unknown[] };
   };

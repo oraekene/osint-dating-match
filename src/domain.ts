@@ -5,6 +5,12 @@ export type DossierLayerName =
   | "relationalSignals"
   | "logistics";
 
+export const PLATFORMS = {
+  reddit: "Reddit",
+  github: "GitHub",
+  youtube: "YouTube",
+} as const;
+
 export const DOSSIER_LAYERS: readonly DossierLayerName[] = [
   "identityFacts",
   "interestLifestyle",
@@ -123,9 +129,10 @@ export interface IdentityGraph {
 export interface CorpusItem {
   accountHandle: string;
   platform: string;
-  kind: "post" | "comment" | "profile" | "media";
+  kind: "post" | "comment" | "profile" | "media" | "repo" | "video";
   pointer: string;
   text?: string;
+  timestamp?: string;
 }
 
 export interface Corpus {

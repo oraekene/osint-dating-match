@@ -26,7 +26,33 @@ const liveOrigin: ExternalPorts = {
           }),
         };
       }
-      if (url.includes("/user/someone/about.json")) {
+      if (url === "https://github.com/someone") {
+        return {
+          status: 200,
+          body: page({
+            title: "Sam Okafor",
+            bio: "Analog shooter",
+            avatar: "https://cdn.shared.test/avatar-a.test",
+          }),
+        };
+      }
+      if (url === "https://www.youtube.com/@someone") {
+        return {
+          status: 200,
+          body: page({
+            title: "Sam Okafor",
+            bio: "Analog shooter",
+            avatar: "https://cdn.shared.test/avatar-a.test",
+          }),
+        };
+      }
+      if (url === "https://www.youtube.com/@someone/videos") {
+        return {
+          status: 200,
+          body: 'var data = [{"videoId":"abc123Video","title":{"runs":[{"text":"Darkroom tour"}]}}];',
+        };
+      }
+      if (url.endsWith("/user/someone/about.json")) {
         return {
           status: 200,
           body: JSON.stringify({ data: { public_description: "Analog shooter" } }),
@@ -71,6 +97,30 @@ const liveOrigin: ExternalPorts = {
         return { status: 200, body: "avatar-bytes-A" };
       if (url.includes("avatar-c.test"))
         return { status: 200, body: "avatar-bytes-C" };
+      if (url === "https://api.github.com/users/someone/repos") {
+        return {
+          status: 200,
+          body: JSON.stringify([
+            {
+              name: "film-scanner",
+              description: "Scanner for film negatives",
+              language: "TypeScript",
+              pushed_at: "2026-08-01T19:45:00Z",
+              html_url: "https://github.com/someone/film-scanner",
+            },
+          ]),
+        };
+      }
+      if (url === "https://api.github.com/users/someone") {
+        return {
+          status: 200,
+          body: JSON.stringify({
+            login: "someone",
+            name: "Sam Okafor",
+            bio: "Analog shooter",
+          }),
+        };
+      }
       if (url.startsWith("https://orbit.test/"))
         return {
           status: 200,

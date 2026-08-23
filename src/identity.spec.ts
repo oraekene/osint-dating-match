@@ -16,6 +16,27 @@ const someoneOrigin: ExternalPorts = {
           body: page({ title: "Sam Okafor", bio: "Analog shooter", avatar: "https://shared.test/avatar-a" }),
         };
       }
+      if (url === "https://api.github.com/users/someone/repos") {
+        return { status: 200, body: JSON.stringify([]) };
+      }
+      if (url === "https://api.github.com/users/someone") {
+        return {
+          status: 200,
+          body: JSON.stringify({ login: "someone", name: "Sam Okafor", bio: "Analog shooter" }),
+        };
+      }
+      if (url === "https://github.com/someone") {
+        return {
+          status: 200,
+          body: page({ title: "Sam Okafor", bio: "Analog shooter", avatar: "https://shared.test/avatar-a" }),
+        };
+      }
+      if (url.includes("youtube.com")) {
+        return {
+          status: 200,
+          body: page({ title: "Sam Okafor", bio: "Analog shooter", avatar: "https://shared.test/avatar-a" }),
+        };
+      }
       if (url.endsWith("/about.json")) {
         return {
           status: 200,

@@ -9,6 +9,8 @@ import { defaultSpine, runPipeline } from "./pipeline.js";
 const liveOrigin: ExternalPorts = {
   http: {
     get: async (url) => {
+      if (url.includes("api.github.com")) return { status: 404, body: "" };
+      if (url.includes("youtube.com")) return { status: 404, body: "" };
       if (url.includes("exist")) return { status: 200, body: "ok" };
       if (url.includes("avatar")) return { status: 200, body: "avatar-A" };
       if (url.includes("/user/someone/about.json")) {

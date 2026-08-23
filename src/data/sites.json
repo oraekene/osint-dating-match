@@ -3,5 +3,7 @@
   { "name": "Chirp", "existenceUrl": "https://chirp.test/exist/{account}", "profileUrl": "https://chirp.test/{account}", "hitStatus": 200 },
   { "name": "Devlog", "existenceUrl": "https://devlog.dev/exist/{account}", "profileUrl": "https://devlog.dev/{account}", "hitStatus": 200 },
   { "name": "Nexus", "existenceUrl": "https://nexus.io/exist/{account}", "profileUrl": "https://nexus.io/{account}", "hitStatus": 200 },
-  { "name": "Reddit", "existenceUrl": "https://www.reddit.com/user/{account}/about.json", "profileUrl": "https://www.reddit.com/user/{account}", "hitStatus": 200 }
+  { "name": "Reddit", "existenceUrl": "https://www.reddit.com/user/{account}/about.json", "profileUrl": "https://www.reddit.com/user/{account}", "hitStatus": 200 },
+  { "name": "GitHub", "existenceUrl": "https://api.github.com/users/{account}", "profileUrl": "https://github.com/{account}", "hitStatus": 200 },
+  { "name": "YouTube", "existenceUrl": "https://www.youtube.com/@{account}/videos", "profileUrl": "https://www.youtube.com/@{account}", "hitStatus": 200 }
 ]

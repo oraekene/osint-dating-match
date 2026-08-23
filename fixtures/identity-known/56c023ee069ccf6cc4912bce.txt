@@ -1,0 +1,1 @@
+{"status":200,"body":"{\"login\":\"someone\",\"name\":\"Sam Okafor\",\"bio\":\"Analog shooter\"}"}

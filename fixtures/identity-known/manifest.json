@@ -9,5 +9,9 @@
   "http|https://cdn.shared.test/avatar-c.test": "c2c13483218771b6318005a5.txt",
   "http|https://nexus.io/exist/someone": "9a9d6fb9376aaef02e4e8fa3.txt",
   "http|https://www.reddit.com/user/someone/about.json": "820797dab39cd775aa4c46b9.txt",
-  "http|https://www.reddit.com/user/someone": "ad20ecfd3d16c1652ccdd9e9.txt"
+  "http|https://www.reddit.com/user/someone": "ad20ecfd3d16c1652ccdd9e9.txt",
+  "http|https://api.github.com/users/someone": "56c023ee069ccf6cc4912bce.txt",
+  "http|https://github.com/someone": "4c7b1d63ace1d59aff86dd56.txt",
+  "http|https://www.youtube.com/@someone/videos": "8ed817b2589fea228a6faab3.txt",
+  "http|https://www.youtube.com/@someone": "b633c898fd80a39485ea9ca2.txt"
 }

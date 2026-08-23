@@ -1,11 +1,9 @@
 import { readFile } from "node:fs/promises";
-import path from "node:path";
 import { realpathSync } from "node:fs";
 import { pathToFileURL } from "node:url";
 import { FixtureGateway } from "./fixtures.js";
-import { manifestIdentityGraph } from "./identity.js";
 import type { PipelineInput } from "./domain.js";
-import { runPipeline, type Spine } from "./pipeline.js";
+import { defaultSpine, runPipeline, type Spine } from "./pipeline.js";
 import {
   JsonSelfDossierStore,
   scoreQuiz,
@@ -16,6 +14,7 @@ export async function main(args: string[]): Promise<string> {
   let fixturesDir: string | null = null;
   let quizFile: string | null = null;
   let selfDir = "self-dossiers";
+  let cacheDir = ".cache";
   const positional: string[] = [];
   for (let i = 0; i < args.length; i++) {
     const arg = args[i];
@@ -25,6 +24,15 @@ export async function main(args: string[]): Promise<string> {
         throw new Error("usage: --fixtures requires a directory argument");
       }
       fixturesDir = value;
+      i++;
+      continue;
+    }
+    if (arg === "--cache-dir") {
+      const value = args[i + 1];
+      if (!value || value.startsWith("--")) {
+        throw new Error("usage: --cache-dir requires a directory argument");
+      }
+      cacheDir = value;
       i++;
       continue;
     }
@@ -59,18 +67,18 @@ export async function main(args: string[]): Promise<string> {
   const handle = positional[0];
   if (!handle) {
     throw new Error(
-      "usage: npm start -- [--fixtures <dir>] [--quiz <answers.json>] <handle>",
+      "usage: npm start -- [--fixtures <dir>] [--cache-dir <dir>] [--quiz <answers.json>] [--self-dir <dir>] <handle>",
     );
   }
 
-  const overrides: Partial<Spine> = {};
+  let spineOverride: Partial<Spine> = {};
   if (fixturesDir) {
     const gateway = await FixtureGateway.fromDirectory(fixturesDir);
-    overrides.identityGraph = manifestIdentityGraph(gateway.ports);
+    spineOverride = defaultSpine(gateway.ports, { cacheDir });
   }
 
   const input: PipelineInput = { handle, priorities: {}, dealbreakers: [] };
-  const result = await runPipeline(input, overrides);
+  const result = await runPipeline(input, spineOverride);
   return JSON.stringify(result, null, 2);
 }
 

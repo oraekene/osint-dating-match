@@ -19,8 +19,12 @@ import {
 import { llmExtraction } from "./extraction.js";
 import { manifestIdentityGraph } from "./identity.js";
 import type { ExternalPorts } from "./ports.js";
+import { compositeAcquisition } from "./acquire.js";
+import { activityInference } from "./activity.js";
 import { CachingHttpPort } from "./cache.js";
+import { githubAcquisition } from "./github.js";
 import { redditAcquisition } from "./reddit.js";
+import { youtubeAcquisition } from "./youtube.js";
 import type {
   AcquisitionStage,
   DossierAssemblyStage,
@@ -65,8 +69,13 @@ export function defaultSpine(
   return {
     ...spine,
     identityGraph: manifestIdentityGraph(ports),
-    acquisition: redditAcquisition(http),
+    acquisition: compositeAcquisition([
+      redditAcquisition(http),
+      githubAcquisition(http),
+      youtubeAcquisition(http),
+    ]),
     extraction: llmExtraction(ports.llm),
+    inference: activityInference(),
     assembly: assemblingDossierStage,
   };
 }

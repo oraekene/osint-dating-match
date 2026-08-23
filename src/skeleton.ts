@@ -69,8 +69,22 @@ export const skeletonAssembly: DossierAssemblyStage = {
 export const assemblingDossierStage: DossierAssemblyStage = {
   assemble: async (handle, claims) => {
     const dossier = emptyDossier(handle);
+    const byKey = new Map<string, number>();
     for (const claim of claims) {
-      dossier.layers[claim.layer].push(claim);
+      const key = `${claim.layer}|${claim.assertion.trim().toLowerCase()}`;
+      const existingIndex = byKey.get(key);
+      if (existingIndex === undefined) {
+        dossier.layers[claim.layer].push(claim);
+        byKey.set(key, dossier.layers[claim.layer].length - 1);
+        continue;
+      }
+      const existing = dossier.layers[claim.layer][existingIndex];
+      if (!existing) continue;
+      const seenPointers = new Set(existing.evidence.map((e) => e.pointer));
+      existing.evidence.push(
+        ...claim.evidence.filter((e) => !seenPointers.has(e.pointer)),
+      );
+      existing.confidence = Math.max(existing.confidence, claim.confidence);
     }
     return dossier;
   },
