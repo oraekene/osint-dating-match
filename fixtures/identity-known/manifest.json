@@ -7,5 +7,7 @@
   "http|https://devlog.dev/exist/someone": "d602f778a446830b46c4aa6d.txt",
   "http|https://devlog.dev/someone": "f7fb92807ad13422d760f9e2.txt",
   "http|https://cdn.shared.test/avatar-c.test": "c2c13483218771b6318005a5.txt",
-  "http|https://nexus.io/exist/someone": "9a9d6fb9376aaef02e4e8fa3.txt"
+  "http|https://nexus.io/exist/someone": "9a9d6fb9376aaef02e4e8fa3.txt",
+  "http|https://www.reddit.com/user/someone/about.json": "820797dab39cd775aa4c46b9.txt",
+  "http|https://www.reddit.com/user/someone": "ad20ecfd3d16c1652ccdd9e9.txt"
 }

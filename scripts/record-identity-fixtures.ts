@@ -16,6 +16,57 @@ const liveOrigin: ExternalPorts = {
     get: async (url) => {
       if (url.includes("nexus.io")) return { status: 404, body: "" };
       if (url.includes("/exist/")) return { status: 200, body: "ok" };
+      if (url === "https://www.reddit.com/user/someone") {
+        return {
+          status: 200,
+          body: page({
+            title: "Sam Okafor",
+            bio: "Analog shooter",
+            avatar: "https://cdn.shared.test/avatar-a.test",
+          }),
+        };
+      }
+      if (url.includes("/user/someone/about.json")) {
+        return {
+          status: 200,
+          body: JSON.stringify({ data: { public_description: "Analog shooter" } }),
+        };
+      }
+      if (url.includes("/submitted.json")) {
+        return {
+          status: 200,
+          body: JSON.stringify({
+            data: {
+              children: [
+                {
+                  data: {
+                    title: "Best film cameras?",
+                    selftext: "Shot Portra all weekend.",
+                    permalink: "/r/AnalogCommunity/comments/abc1/",
+                  },
+                },
+              ],
+            },
+          }),
+        };
+      }
+      if (url.includes("/comments.json")) {
+        return {
+          status: 200,
+          body: JSON.stringify({
+            data: {
+              children: [
+                {
+                  data: {
+                    body: "Portra over Gold any day.",
+                    permalink: "/r/AnalogCommunity/comments/abc1/gx9",
+                  },
+                },
+              ],
+            },
+          }),
+        };
+      }
       if (url.includes("avatar-a.test"))
         return { status: 200, body: "avatar-bytes-A" };
       if (url.includes("avatar-c.test"))

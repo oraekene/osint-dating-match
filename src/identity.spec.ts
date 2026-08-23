@@ -10,6 +10,26 @@ const someoneOrigin: ExternalPorts = {
     get: async (url) => {
       if (url.includes("nexus.io")) return { status: 404, body: "" };
       if (url.includes("exist")) return { status: 200, body: "ok" };
+      if (url === "https://www.reddit.com/user/someone") {
+        return {
+          status: 200,
+          body: page({ title: "Sam Okafor", bio: "Analog shooter", avatar: "https://shared.test/avatar-a" }),
+        };
+      }
+      if (url.endsWith("/about.json")) {
+        return {
+          status: 200,
+          body: JSON.stringify({
+            data: { public_description: "Analog shooter" },
+          }),
+        };
+      }
+      if (url.includes("submitted.json") || url.includes("comments.json")) {
+        return { status: 200, body: JSON.stringify({ data: { children: [] } }) };
+      }
+      if (url.includes("/avatar-a")) {
+        return { status: 200, body: "avatar-bytes-A" };
+      }
       if (url.includes("orbit.test/avatar")) {
         return { status: 200, body: "avatar-bytes-A" };
       }

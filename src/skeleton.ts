@@ -16,10 +16,13 @@ import type {
   VerdictRenderingStage,
 } from "./spine.js";
 
-export function emptyDossier(handle: string): Dossier {
+export function emptyDossier(
+  handle: string,
+  mode: Dossier["mode"] = "recon",
+): Dossier {
   return {
     person: { primaryHandle: handle },
-    mode: "recon",
+    mode,
     version: 0,
     layers: emptyLayers(),
   };
@@ -61,6 +64,16 @@ export const skeletonInference: InferenceStage = {
 
 export const skeletonAssembly: DossierAssemblyStage = {
   assemble: async (handle) => emptyDossier(handle),
+};
+
+export const assemblingDossierStage: DossierAssemblyStage = {
+  assemble: async (handle, claims) => {
+    const dossier = emptyDossier(handle);
+    for (const claim of claims) {
+      dossier.layers[claim.layer].push(claim);
+    }
+    return dossier;
+  },
 };
 
 export const skeletonMatching: MatchingStage = {

@@ -134,27 +134,47 @@ function similarityEvidence(
   return { confidence: Math.min(confidence, 0.95), evidence };
 }
 
-function pickReference(
-  hits: { site: SiteEntry; signals: ProfileSignals }[],
-): { site: SiteEntry; signals: ProfileSignals } | undefined {
-  const avatarCounts = new Map<string, number>();
-  for (const hit of hits) {
-    if (!hit.signals.avatarHash) continue;
-    avatarCounts.set(
-      hit.signals.avatarHash,
-      (avatarCounts.get(hit.signals.avatarHash) ?? 0) + 1,
+const AGREEMENT_WEIGHTS = {
+  avatarMatch: 2,
+  displayNameSimilarity: 1,
+  bioSimilarity: 1,
+} as const;
+
+interface CandidateHit {
+  site: SiteEntry;
+  signals: ProfileSignals;
+}
+
+function agreement(a: ProfileSignals, b: ProfileSignals): number {
+  let score = 0;
+  if (a.avatarHash !== null && a.avatarHash === b.avatarHash) {
+    score += AGREEMENT_WEIGHTS.avatarMatch;
+  }
+  score += AGREEMENT_WEIGHTS.displayNameSimilarity * jaccard(a.displayName, b.displayName);
+  score += AGREEMENT_WEIGHTS.bioSimilarity * jaccard(a.bio, b.bio);
+  return score;
+}
+
+function pickReference(hits: CandidateHit[]): CandidateHit | undefined {
+  if (hits.length === 0) return undefined;
+  if (hits.length === 1) return hits[0];
+
+  let bestIndex = 0;
+  let bestScore = -1;
+  hits.forEach((hit, index) => {
+    const total = hits.reduce(
+      (sum, other) =>
+        other.site.name === hit.site.name
+          ? sum
+          : sum + agreement(hit.signals, other.signals),
+      0,
     );
-  }
-  let dominantHash: string | null = null;
-  let dominantCount = 1;
-  for (const [hash, count] of avatarCounts) {
-    if (count > dominantCount) {
-      dominantHash = hash;
-      dominantCount = count;
+    if (total > bestScore) {
+      bestScore = total;
+      bestIndex = index;
     }
-  }
-  if (dominantHash === null) return hits[0];
-  return hits.find((hit) => hit.signals.avatarHash === dominantHash);
+  });
+  return hits[bestIndex];
 }
 
 export async function resolveIdentityGraph(
@@ -163,7 +183,7 @@ export async function resolveIdentityGraph(
   sites: readonly SiteEntry[],
 ): Promise<IdentityGraph> {
   const profiles = new Map<string, ProfileSignals>();
-  const hits: { site: SiteEntry; signals: ProfileSignals }[] = [];
+  const hits: CandidateHit[] = [];
 
   for (const site of sites) {
     const existence = await ports.http.get(fill(site.existenceUrl, handle));

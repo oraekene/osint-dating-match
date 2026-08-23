@@ -1,11 +1,11 @@
 import type {
   Dossier,
   IdentityGraph,
-  MatchVerdict,
   PipelineInput,
   PipelineResult,
 } from "./domain.js";
 import {
+  assemblingDossierStage,
   skeletonAcquisition,
   skeletonAssembly,
   skeletonExtraction,
@@ -16,6 +16,11 @@ import {
   skeletonRendering,
   skeletonVerdict,
 } from "./skeleton.js";
+import { llmExtraction } from "./extraction.js";
+import { manifestIdentityGraph } from "./identity.js";
+import type { ExternalPorts } from "./ports.js";
+import { CachingHttpPort } from "./cache.js";
+import { redditAcquisition } from "./reddit.js";
 import type {
   AcquisitionStage,
   DossierAssemblyStage,
@@ -38,8 +43,11 @@ export interface Spine {
   rendering: VerdictRenderingStage;
 }
 
-export function defaultSpine(): Spine {
-  return {
+export function defaultSpine(
+  ports?: ExternalPorts,
+  options?: { cacheDir?: string },
+): Spine {
+  const spine: Spine = {
     intake: skeletonIntake,
     identityGraph: skeletonIdentityGraph,
     acquisition: skeletonAcquisition,
@@ -48,6 +56,18 @@ export function defaultSpine(): Spine {
     assembly: skeletonAssembly,
     matching: skeletonMatching,
     rendering: skeletonRendering,
+  };
+  if (!ports) return spine;
+
+  const http = options?.cacheDir
+    ? new CachingHttpPort(ports.http, options.cacheDir)
+    : ports.http;
+  return {
+    ...spine,
+    identityGraph: manifestIdentityGraph(ports),
+    acquisition: redditAcquisition(http),
+    extraction: llmExtraction(ports.llm),
+    assembly: assemblingDossierStage,
   };
 }
 
