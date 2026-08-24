@@ -12,10 +12,10 @@ import {
   skeletonIdentityGraph,
   skeletonInference,
   skeletonIntake,
-  skeletonMatching,
   skeletonRendering,
   skeletonVerdict,
 } from "./skeleton.js";
+import { matchDossiers } from "./matcher.js";
 import { llmExtraction } from "./extraction.js";
 import { manifestIdentityGraph } from "./identity.js";
 import type { ExternalPorts } from "./ports.js";
@@ -52,6 +52,18 @@ export interface Spine {
   rendering: VerdictRenderingStage;
 }
 
+const dossierMatching: MatchingStage = {
+  match: async (subject, input) => {
+    if (!input.selfDossier) return null;
+    return matchDossiers(
+      input.selfDossier,
+      subject,
+      input.priorities,
+      input.dealbreakers,
+    );
+  },
+};
+
 export function defaultSpine(
   ports?: ExternalPorts,
   options?: { cacheDir?: string; dossierDir?: string },
@@ -63,7 +75,7 @@ export function defaultSpine(
     extraction: skeletonExtraction,
     inference: skeletonInference,
     assembly: skeletonAssembly,
-    matching: skeletonMatching,
+    matching: dossierMatching,
     rendering: skeletonRendering,
   };
   if (!ports) return spine;

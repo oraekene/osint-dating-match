@@ -78,6 +78,8 @@ export type PriorityWeights = Partial<Record<DossierLayerName, number>>;
 
 export interface Dealbreaker {
   description: string;
+  layer: DossierLayerName;
+  terms: string[];
 }
 
 export interface TriggeredDealbreaker {
@@ -114,6 +116,7 @@ export interface PipelineInput {
   handle: string;
   priorities: PriorityWeights;
   dealbreakers: Dealbreaker[];
+  selfDossier?: Dossier;
 }
 
 export interface MatchOutput {

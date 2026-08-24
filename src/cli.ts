@@ -49,7 +49,7 @@ export async function main(args: string[]): Promise<string> {
   const handle = positional[0];
   if (!handle) {
     throw new Error(
-      "usage: npm start -- [--fixtures <dir>] [--cache-dir <dir>] [--quiz <answers.json>] [--self-dir <dir>] <handle>",
+      "usage: npm start -- [--fixtures <dir>] [--cache-dir <dir>] [--dossier-dir <dir>] [--quiz <answers.json>] [--self-dir <dir>] <handle>",
     );
   }
 
@@ -62,7 +62,21 @@ export async function main(args: string[]): Promise<string> {
     });
   }
 
-  const input: PipelineInput = { handle, priorities: {}, dealbreakers: [] };
+  let selfDossier: PipelineInput["selfDossier"] = undefined;
+  try {
+    const store = new JsonSelfDossierStore(selfDir);
+    const latest = await store.latest();
+    if (latest) selfDossier = latest;
+  } catch {
+    // no self dossier available — run without it
+  }
+
+  const input: PipelineInput = {
+    handle,
+    priorities: {},
+    dealbreakers: [],
+    ...(selfDossier ? { selfDossier } : {}),
+  };
   const result = await runPipeline(input, spineOverride);
   return JSON.stringify(result, null, 2);
 }
